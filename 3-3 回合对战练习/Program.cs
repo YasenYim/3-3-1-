@@ -3,109 +3,105 @@ using System.Collections.Generic;
 
 namespace _3_3_回合对战练习
 {
-    public enum SkillType
-    {
-        NormalAttack,
-    }
-    class Character
-    {
-        public string name { get; private set; }
-        public int hp { get; private set; }
-        public int maxHp { get; private set; }
-        public int attack { get; private set; }
-        public int def { get; private set; }
-
-        public int critChance;    // 暴击率，万分比
-        public int cirtRate = 20000;         // 暴击为2倍
-
-        public List<Skill> skills { get; private set; }
-        public Character(string name, int hp,int attack,int def,int critChance)
-        {
-            this.name = name;
-            this.maxHp = hp;
-            this.hp = maxHp;
-            this.attack = attack;
-            this.def = def;
-            this.critChance = critChance;
-            skills = new List<Skill>();
-        }
-        public void CostHp(int cost)
-        {
-            this.hp -= cost;
-            if (this.hp <= 0)
-            { this.hp = 0; }
-        }
-        public void AddSkill(Skill skill)
-        {
-            skills.Add(skill);
-        }
-
-        public void Attack(Skill skill, Character other)
-        {
-            switch(skill.type)
-            {
-                case SkillType.NormalAttack:
-                    {
-                        float a = attack * (skill.data1 / 10000f);
-                        int damage = (int)(a * (1 - (float)other.def / (300 - other.def)));
-                        other.CostHp(damage);
-                        Console.WriteLine($"{this.name}使用了{skill.name}对{other.name}造成了{damage}点伤害~");
-                        Console.WriteLine($"{other.name} 体力：{other.hp}/{other.maxHp} ");
-                    }
-                    break;
-            }
-        }
-
-        public bool IsDead()
-        {
-            return hp <= 0;
-        }
-    }
- 
-    class Skill
-    {
-        public string name;
-        public SkillType type;
-        public int data1;
-
-        public Skill(string name,SkillType type,int data1)
-        {
-            this.name = name;
-            this.type = type;
-            this.data1 = data1;
-        }
-    }
+   
     class Program
     {
+        // 输入数字，如果错误重新输入
+        static int InputNum()
+        {
+            while (true)
+            {
+                Console.WriteLine("请输入一个数字：");
+                string input = Console.ReadLine();
+
+                int num;
+                bool success = int.TryParse(input, out num); // out输出参数
+
+                if (!success)
+                {
+                    Console.WriteLine("请重新输入");
+                    continue;    // continue的意思是不再执行循环体后面的内容，直接开始下一次循环string input  = Console.ReadLine();如果成功了就会return num;
+                }
+
+                return num;
+            }
+        }
+        static Skill ChooseSkill(Character cha)
+        {
+            // 打印角色的技能列表
+            for(int i = 0;i < cha.skills.Count;i++)
+            {
+                Skill skill = cha.skills[i];
+                Console.WriteLine($"{i + 1}.{skill.name}");
+            }
+
+            // 让用户输入技能序号
+            int index = -1;
+            while(index < 0 || index >= cha.skills.Count)
+            {
+                index = InputNum() - 1;
+            }
+
+            // 选中技能并返回技能
+            Skill choose = cha.skills[index];
+            return choose;
+        }
+
+        static Skill RandomSkill(Character cha)
+        {
+            int index = Utils.random.Next(0, cha.skills.Count);
+            return cha.skills[index];
+        }
         static void Main(string[] args)
         {
-            Character player = new Character($"三尾狐" ,875, 124, 68 ,1000);
-            Skill skill1 = new Skill("尾袭",SkillType.NormalAttack,10000);
+            Character player = new Character("三尾狐", 875, 124, 68, 1000);
+            Skill skill1 = new Skill("尾袭", SkillType.NormalAttack ,10000);
+            Skill skill2 = new Skill("诱惑", SkillType.SuckBlood, 8000,2000);
             player.AddSkill(skill1);
+            player.AddSkill(skill2);
 
-            Character enemy = new Character($"雨女", 1035, 97, 73, 500);
+            Character enemy = new Character("雨女", 1035, 97, 73, 500);
             Skill eskill1 = new Skill("泪珠", SkillType.NormalAttack, 10000);
+            Skill eskill2 = new Skill("治疗", SkillType.Heal,true, 7000);
             enemy.AddSkill(eskill1);
+            enemy.AddSkill(eskill2);
 
             int round = 1;
             while(true)
             {
-                Console.WriteLine($"-------第{round}------");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine($"-------第{round}回合-------");
                 // 玩家攻击敌人
+                Console.ForegroundColor = ConsoleColor.Green;
                 // 选择技能
-                Skill playerSkill = player.skills[0];
-                player.Attack(playerSkill, enemy);
+                Skill playerSkill = ChooseSkill(player);
+                if(playerSkill.self)
+                {
+                    player.Attack(playerSkill, player);
+                }
+                else
+                {
+                    player.Attack(playerSkill, enemy);
+                }
                 // 判断死亡
-                if(enemy.IsDead())
+                if (enemy.IsDead())
                 {
                     Console.WriteLine($"{enemy.name}战败了~");
                     break;
                 }
 
                 // 敌人攻击玩家
+                Console.ForegroundColor = ConsoleColor.Red;
                 // 选择技能
-                Skill enemySkill = enemy.skills[0];
-                enemy.Attack(enemySkill, player);
+                Skill enemySkill = RandomSkill(enemy);
+                if (enemySkill.self)  
+                {
+                    enemy.Attack(enemySkill, enemy);
+                }
+                else
+                {
+                    enemy.Attack(enemySkill, player);
+                }
                 // 判断死亡
                 if (player.IsDead())
                 {
@@ -113,16 +109,22 @@ namespace _3_3_回合对战练习
                     break;
                 }
             }
-            if(player.IsDead())
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+
+            if (player.IsDead())
             {
-                Console.WriteLine($"{player.name}战败了,游戏结束。");
+                Console.WriteLine($"{player.name}战败了");
             }
             else
             {
-                Console.WriteLine($"{enemy.name}战败了。");
-                Console.WriteLine($"恭喜{player.name}获得了胜利！");
+                Console.WriteLine($"{enemy.name}战败了~");
+                Console.WriteLine($"恭喜{player.name}获得了胜利");
             }
             Console.ReadKey();
+
+
+
 
         }
     }
