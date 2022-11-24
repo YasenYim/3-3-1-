@@ -74,6 +74,15 @@ namespace _3_3_回合制对战练习_中
                         Console.WriteLine($"{name}吸收了{suck}点生命。 体力：{hp}/{maxHp}");
                     }
                     break;
+                case SkillType.Heal:
+                    {
+                        int heal = (int)(attack * (skill.data1 / 10000f));
+                        other.AddHp(heal);
+
+                        Console.WriteLine($"{this.name}使用了治疗技能，治疗{heal}点生命力~~");
+                        Console.WriteLine($"{this.name} 体力：{hp}/{maxHp}");
+                    }
+                    break;
             }
         }
 
