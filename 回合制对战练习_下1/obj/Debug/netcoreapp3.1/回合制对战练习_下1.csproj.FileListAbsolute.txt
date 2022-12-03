@@ -11,3 +11,4 @@ E:\Unity\NikoLua\Hello\回合制对战练习_下1\obj\Debug\netcoreapp3.1\回合
 E:\Unity\NikoLua\Hello\回合制对战练习_下1\obj\Debug\netcoreapp3.1\回合制对战练习_下1.dll
 E:\Unity\NikoLua\Hello\回合制对战练习_下1\obj\Debug\netcoreapp3.1\回合制对战练习_下1.pdb
 E:\Unity\NikoLua\Hello\回合制对战练习_下1\obj\Debug\netcoreapp3.1\回合制对战练习_下1.genruntimeconfig.cache
+E:\Unity\NikoLua\Hello\回合制对战练习_下1\obj\Debug\netcoreapp3.1\回合制对战练习_下1.csproj.AssemblyReference.cache

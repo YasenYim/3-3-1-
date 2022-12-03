@@ -4,7 +4,6 @@ namespace 回合制对战练习_下1
 {
     class Program
     {
-        // 输入数字，如果错误重新输入
         static int InputNum()
         {
             while (true)
@@ -18,13 +17,13 @@ namespace 回合制对战练习_下1
                 if (!success)
                 {
                     Console.WriteLine("请重新输入");
-                    continue;
+                    continue;    // continue的意思是不再执行循环体后面的内容，直接开始下一次循环string input  = Console.ReadLine();如果成功了就会return num;
                 }
 
                 return num;
             }
         }
-        static Skill ChooseSkill(Character cha)
+        public static Skill ChooseSkill(Character cha)
         {
             // 打印角色的技能列表
             for (int i = 0; i < cha.skills.Count; i++)
@@ -32,8 +31,7 @@ namespace 回合制对战练习_下1
                 Skill skill = cha.skills[i];
                 Console.WriteLine($"{i + 1}.{skill.name}");
             }
-
-            // 让用户输入技能序号
+            // 让用户输入数字
             int index = -1;
             while (index < 0 || index >= cha.skills.Count)
             {
@@ -44,19 +42,17 @@ namespace 回合制对战练习_下1
             Skill choose = cha.skills[index];
             return choose;
         }
-
         static Skill RandomSkill(Character cha)
         {
             int index = Utils.random.Next(0, cha.skills.Count);
             return cha.skills[index];
         }
-
         static void PrintState(Character cha)
         {
             for (int i = 0; i < cha.states.Count; i++)
             {
                 State state = cha.states[i];
-                Console.Write(state + "  ");
+                Console.Write(state + " ");
             }
             Console.WriteLine();
         }
@@ -66,7 +62,6 @@ namespace 回合制对战练习_下1
             Skill skill1 = new Skill("尾袭", SkillType.NormalAttack, 10000);
             Skill skill2 = new Skill("诱惑", SkillType.SuckBlood, 8000, 2000);
             Skill skill3 = new Skill("治愈之光", SkillType.HealOverTime, 5000, 2200, 3);
-
             player.AddSkill(skill1);
             player.AddSkill(skill2);
             player.AddSkill(skill3);
@@ -83,7 +78,7 @@ namespace 回合制对战练习_下1
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine($"------第{round}回合------");
+                Console.WriteLine($"--------第{round}回---------");
 
                 // 显示角色身上的状态
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -94,7 +89,6 @@ namespace 回合制对战练习_下1
 
                 // 行动之前，状态生效
                 player.StatesEffect();
-
                 // 选择技能
                 Skill playerSkill = ChooseSkill(player);
                 if (playerSkill.self)
@@ -105,12 +99,15 @@ namespace 回合制对战练习_下1
                 {
                     player.Attack(playerSkill, enemy);
                 }
+                //Skill playerSkill = player.skills[0];
 
+                // 判断死亡
+                if (player.IsDead())
+                {
+                    Console.WriteLine($"{player.name}战败了~~");
+                    break;
+                }
 
-
-                // 判断敌人是否死亡
-                if (enemy.IsDead())
-                { Console.WriteLine($"{enemy.name}战败了！"); break; }
 
                 // 显示角色身上的状态
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -118,7 +115,6 @@ namespace 回合制对战练习_下1
 
                 // 敌人攻击玩家
                 Console.ForegroundColor = ConsoleColor.Red;
-
                 // 行动之前，状态生效
                 enemy.StatesEffect();
 
@@ -132,21 +128,28 @@ namespace 回合制对战练习_下1
                 {
                     enemy.Attack(enemySkill, player);
                 }
-
-
-                // 判断敌人是否死亡
-                if (player.IsDead())
-                { Console.WriteLine($"{player.name}战败了！"); break; }
+                //Skill enemySkill = enemy.skills[0];
+                // 玩家攻击敌人
+                // 判断死亡
+                if (enemy.IsDead())
+                {
+                    Console.WriteLine($"{enemy.name}战败了~~");
+                    break;
+                }
             }
 
-            Console.ForegroundColor = ConsoleColor.Gray;
-
             if (player.IsDead())
-            { Console.WriteLine($"{player.name}战败了，游戏结束。"); }
+            {
+                Console.WriteLine($"{player.name}战败了");
+            }
             else
-            { Console.WriteLine($"恭喜{player.name}获得胜利！"); }
-
+            {
+                Console.WriteLine($"{enemy.name}战败了");
+                Console.WriteLine($"恭喜{player.name}获得了胜利!");
+            }
             Console.ReadKey();
         }
+
+
     }
 }
